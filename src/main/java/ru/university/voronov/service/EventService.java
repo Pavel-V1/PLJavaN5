@@ -1,9 +1,7 @@
 package ru.university.voronov.service;
 
-import ru.university.voronov.exception.EventDateException;
-import ru.university.voronov.exception.EventNameException;
-import ru.university.voronov.exception.EventNotFoundException;
-import ru.university.voronov.exception.EventTitleException;
+import ru.university.voronov.exception.*;
+import ru.university.voronov.model.Birthday;
 import ru.university.voronov.model.Event;
 import ru.university.voronov.repository.EventRepository;
 
@@ -25,6 +23,8 @@ public class EventService {
             throw new EventNameException();
         } else if (event.getDate() == null) {
             throw new EventDateException();
+        } else if (event.getClass() == Birthday.class && ((Birthday) event).getGift() == null) {
+            throw new BirthdayGiftException();
         }
     }
 

@@ -140,7 +140,7 @@ public class CmdController {
 //            String rawGift = scanner.nextLine();
 //            try {
 //                UUID giftID = UUID.fromString(rawGift);
-//                Gift gift = giftService.getById(id);
+//                Gift gift = giftService.getById(giftID);
 //            } catch (Exception e) {
 //                Gift gift = new Gift(rawGift, UUID.randomUUID());
 //            }

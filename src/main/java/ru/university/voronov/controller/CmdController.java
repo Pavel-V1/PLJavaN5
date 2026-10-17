@@ -42,7 +42,7 @@ public class CmdController {
                         break;
 
                     case "2":
-                        getById();
+                        getByDate();
                         break;
 
                     case "3":
@@ -83,19 +83,19 @@ public class CmdController {
                 .forEach(System.out::println);
     }
 
-    private void getById() {
-        System.out.println("Введите ID события: ");
-        String rawId = scanner.nextLine();
+    private void getByDate() {
+        System.out.println("Введите день/месяц/год события: ");
+        String rawDate = scanner.nextLine();
         try {
-            UUID id = UUID.fromString(rawId);
-            eventService.getById(id)
+            Date date = Date.from(Instant.parse(rawDate));
+            eventService.getByDate(date)
                     .map(this::formatEvent)
                     .ifPresentOrElse(
                             System.out::println,
-                            () -> System.out.println("Задачи с таким идентификатором не найдено")
+                            () -> System.out.println("Задачи с такой датой не найдено")
                     );
         } catch (Exception e) {
-            System.out.println("Неверно задан идентификатор");
+            System.out.println("Неверно задана дата");
         }
     }
 
@@ -147,24 +147,24 @@ public class CmdController {
             Gift gift = new Gift(scanner.nextLine(), UUID.randomUUID());
             // Да, да, по-хорошему, раз уж я по такому пути пошел, то должен и отдельные репозиторий с сервисом сделать, а это костыль.
             // Но я отложу эту задачу на потом, ведь сейчас главное - события, а подарки можно и на строки заменить.
-            event = new Birthday(UUID.randomUUID(), title, date, name, beginning, gift, about);
+            event = new Birthday(title, date, name, beginning, gift, about);
         } else {
-            event = new Meeting(UUID.randomUUID(), title, date, name, beginning, about);
+            event = new Meeting(title, date, name, beginning, about);
         }
         Event created = eventService.create(event);
         System.out.println("Создано событие: " + formatEvent(created));
     }
 
     private void updateEvent() {
-        eventService.getById(getUuid())
+        eventService.getByDate(getDate())
                 .ifPresentOrElse(
                         this::updateThisEvent,
-                        () -> System.out.println("Нет задачи с таким идентификатором")
+                        () -> System.out.println("Нет задачи с такой датой")
                 );
     }
 
     private void deleteEvent() {
-        eventService.deleteById(getUuid());
+        eventService.deleteByDate(getDate());
     }
 
     private String formatEvent(Event event) {
@@ -175,22 +175,22 @@ public class CmdController {
             string = "";
         }
         return String.format("id = $s, title = $s, date = $s, name = $s, about = $s" + string,
-                event.getId(), event.getTitle(), event.getDate(), event.getName(), event.getAbout());
+                event.getDate(), event.getTitle(), event.getDate(), event.getName(), event.getAbout());
     }
 
-    private UUID getUuid() {
-        UUID uuid;
+    private Date getDate() {
+        Date date;
         while (true) {
-            System.out.println("Введите идентификатор события: ");
-            String id = scanner.nextLine();
+            System.out.println("Введите дату события: ");
+            String rawDate = scanner.nextLine();
             try {
-                uuid = UUID.fromString(id);
+                date = Date.from(Instant.parse(rawDate));
                 break;
             } catch (Exception e) {
-                System.out.println("Неверно задан идентификатор. Введите заново");
+                System.out.println("Неверно задана дата. Введите заново");
             }
         }
-        return uuid;
+        return date;
     }
 
     private void updateThisEvent(Event event) {
@@ -238,7 +238,7 @@ public class CmdController {
         if (was) {
             eventService.update(event);
         } else {
-            System.out.println("Изменения не были обнаружены");
+            System.out.println("Убедитесь, что ввод корректный");
         }
     }
 }

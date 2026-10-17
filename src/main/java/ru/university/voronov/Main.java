@@ -15,11 +15,11 @@ import ru.university.voronov.service.EventService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.UUID;
+import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
-        Map<UUID, Event> eventMap = new HashMap<>();
+        Map<Date, Event> eventMap = new HashMap<>();
         EventRepositoryInMemoryImpl eventRepositoryInMemory = new EventRepositoryInMemoryImpl(eventMap);
         EventService eventService = new EventService(eventRepositoryInMemory);
         Scanner scanner = new Scanner(System.in);

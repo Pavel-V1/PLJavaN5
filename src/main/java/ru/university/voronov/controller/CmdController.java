@@ -2,7 +2,6 @@ package ru.university.voronov.controller;
 
 import ru.university.voronov.model.Birthday;
 import ru.university.voronov.model.Event;
-import ru.university.voronov.model.Gift;
 import ru.university.voronov.model.Meeting;
 import ru.university.voronov.service.EventService;
 
@@ -10,7 +9,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class CmdController {
 
@@ -26,7 +24,7 @@ public class CmdController {
         while (true) {
             System.out.println("\n=== Events menu ===");
             System.out.println("1. Показать все события");
-            System.out.println("2. Найти событие по ID");
+            System.out.println("2. Найти событие по дате");
             System.out.println("3. Создать событие");
             System.out.println("4. Обновить событие");
             System.out.println("5. Удалить событие");
@@ -128,25 +126,15 @@ public class CmdController {
         String title = scanner.nextLine();
         System.out.println("Введите имя человека, с которым связано событие: ");
         String name = scanner.nextLine();
-        System.out.println("Введите дату события: ");
-        Date date = Date.from(Instant.parse(scanner.nextLine()));
+        Date date = tryToGetDate();
         System.out.println("Введите время начала события: ");
-        int beginning = scanner.nextInt();
+        String beginning = scanner.nextLine();
         System.out.println("Введите описание: ");
         String about = scanner.nextLine();
         Event event;
         if (typeInt == 1) {
             System.out.println("Введите подарок: ");
-//            String rawGift = scanner.nextLine();
-//            try {
-//                UUID giftID = UUID.fromString(rawGift);
-//                Gift gift = giftService.getById(giftID);
-//            } catch (Exception e) {
-//                Gift gift = new Gift(rawGift, UUID.randomUUID());
-//            }
-            Gift gift = new Gift(scanner.nextLine(), UUID.randomUUID());
-            // Да, да, по-хорошему, раз уж я по такому пути пошел, то должен и отдельные репозиторий с сервисом сделать, а это костыль.
-            // Но я отложу эту задачу на потом, ведь сейчас главное - события, а подарки можно и на строки заменить.
+            String gift = scanner.nextLine();
             event = new Birthday(title, date, name, beginning, gift, about);
         } else {
             event = new Meeting(title, date, name, beginning, about);
@@ -156,7 +144,7 @@ public class CmdController {
     }
 
     private void updateEvent() {
-        eventService.getByDate(getDate())
+        eventService.getByDate(tryToGetDate())
                 .ifPresentOrElse(
                         this::updateThisEvent,
                         () -> System.out.println("Нет задачи с такой датой")
@@ -164,21 +152,30 @@ public class CmdController {
     }
 
     private void deleteEvent() {
-        eventService.deleteByDate(getDate());
+        eventService.deleteByDate(tryToGetDate());
     }
 
     private String formatEvent(Event event) {
         String string;
-        if (event.getClass() == Birthday.class) {
-            string = String.format(", gift = $s", ((Birthday) event).getGift().getContent());
+        if (event instanceof Birthday) {
+            string = String.format(
+                    ", gift = %s",
+                    ((Birthday) event).getGift()
+            );
         } else {
             string = "";
         }
-        return String.format("id = $s, title = $s, date = $s, name = $s, about = $s" + string,
-                event.getDate(), event.getTitle(), event.getDate(), event.getName(), event.getAbout());
+        return String.format(
+                "title = %s, date = %s, name = %s, about = %s%s",
+                event.getTitle(),
+                event.getDate(),
+                event.getName(),
+                event.getAbout(),
+                string
+        );
     }
 
-    private Date getDate() {
+    private Date tryToGetDate() {
         Date date;
         while (true) {
             System.out.println("Введите дату события: ");
@@ -194,45 +191,37 @@ public class CmdController {
     }
 
     private void updateThisEvent(Event event) {
-        String add = event.getClass() == Birthday.class ? ";\n6. Подарок" : "";
+        boolean isBirthday = event instanceof Birthday;
+        String add = isBirthday ? ";\n6. Подарок" : "";
         System.out.println("1. Заголовок;\n2. Дата;\n3. Имя;\n4. Время начала;\n5. Описание" + add + ".\nВведите, какие данные хотите обновить: ");
         String choices = scanner.nextLine();
         boolean was = false;
-        if (choices.contains("1")) {
-            System.out.println("Введите новый заголовок события: ");
-            String newTitle = scanner.nextLine();
-            event.setTitle(newTitle);
-            was = true;
-        }
-        if (choices.contains("2")) {
-            System.out.println("Введите новую дату: ");
-            Date newDate = Date.from(Instant.parse(scanner.nextLine()));
-            event.setDate(newDate);
-            was = true;
-        }
-        if (choices.contains("3")) {
-            System.out.println("Введите новое имя: ");
-            String newName = scanner.nextLine();
-            event.setName(newName);
-            was = true;
-        }
-        if (choices.contains("4")) {
-            System.out.println("Введите новое время начала: ");
-            int newBeginning = scanner.nextInt();
-            event.setBeginning(newBeginning);
-            was = true;
-        }
-        if (choices.contains("5")) {
-            System.out.println("Введите новое описание: ");
-            String newAbout = scanner.nextLine();
-            event.setAbout(newAbout);
-            was = true;
-        }
-        if (choices.contains("6") && event.getClass() == Birthday.class) {
-            System.out.println("Введите новый подарок: ");
-            Gift gift = new Gift(scanner.nextLine(), UUID.randomUUID());
-            ((Birthday) event).setGift(gift);
-            was = true;
+        List<String> str = List.of("новый заголовок события", "новую дату", "новое имя", "новое время начала", "новое описание", "новый подарок");
+        for (int i = 1; i <= 6; i++) {
+            if (choices.contains(String.valueOf(i))) {
+                if (!isBirthday && i == 6) break;
+                System.out.println("Введите " + str.get(i-1) + ": ");
+                String newArg = scanner.nextLine();
+                if (i == 2) {
+                    Date newDate;
+                    try {
+                        newDate = Date.from(Instant.parse(newArg));
+                    } catch (Exception e) {
+                        System.out.println("Неверно задана дата. Введите заново");
+                        newDate = tryToGetDate();
+                    }
+                    event.setDate(newDate);
+                } else {
+                    switch (i) {
+                        case 1 -> event.setTitle(newArg);
+                        case 3 -> event.setName(newArg);
+                        case 4 -> event.setBeginning(newArg);
+                        case 5 -> event.setAbout(newArg);
+                        case 6 -> ((Birthday) event).setGift(newArg);
+                    }
+                }
+                was = true;
+            }
         }
 
         if (was) {

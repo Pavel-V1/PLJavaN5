@@ -16,18 +16,6 @@ public class EventService {
         this.eventRepository = eventRepository;
     }
 
-    private void check(Event event) {
-        if (event.getTitle().isBlank()) {
-            throw new EventTitleException();
-        } else if (event.getName().isBlank()) {
-            throw new EventNameException();
-        } else if (event.getDate() == null) {
-            throw new EventDateException();
-        } else if (event.getClass() == Birthday.class && ((Birthday) event).getGift() == null) {
-            throw new BirthdayGiftException();
-        }
-    }
-
     public Event create(Event newEvent) {
         check(newEvent);
 
@@ -54,5 +42,17 @@ public class EventService {
 
     public List<Event> getAll() {
         return eventRepository.getAll();
+    }
+
+    private void check(Event event) {
+        if (event.getTitle().isBlank()) {
+            throw new EventTitleException();
+        } else if (event.getName().isBlank()) {
+            throw new EventNameException();
+        } else if (event.getDate() == null) {
+            throw new EventDateException();
+        } else if (event.getClass() == Birthday.class && ((Birthday) event).getGift().isBlank()) {
+            throw new BirthdayGiftException();
+        }
     }
 }

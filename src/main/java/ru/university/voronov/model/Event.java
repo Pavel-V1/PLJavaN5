@@ -5,7 +5,7 @@ import java.util.Date;
 public abstract class Event {
     private Date date;
     private String name;
-    private int beginning;
+    private String beginning;
     private String about;
     private String title;
 
@@ -25,11 +25,11 @@ public abstract class Event {
         this.name = name;
     }
 
-    public int getBeginning() {
+    public String getBeginning() {
         return beginning;
     }
 
-    public void setBeginning(int beginning) {
+    public void setBeginning(String beginning) {
         this.beginning = beginning;
     }
 

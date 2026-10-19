@@ -175,11 +175,15 @@ public class CmdController {
         );
     }
 
-    private Date tryToGetDate() {
+    private Date tryToGetDate() {return tryToGetDate(null);}
+
+    private Date tryToGetDate(String message) {
+        if (message == null) message = "Введите дату события(гггг-мм-дд чч:мм): ";
         Date date;
         while (true) {
-            System.out.println("Введите дату события: ");
-            String rawDate = scanner.nextLine();
+            System.out.println(message);
+            String[] dates = scanner.nextLine().split(" ");
+            String rawDate = dates[0] + "T" + dates[1] + ":00Z";
             try {
                 date = Date.from(Instant.parse(rawDate));
                 break;
@@ -197,28 +201,22 @@ public class CmdController {
         String choices = scanner.nextLine();
         boolean was = false;
         List<String> str = List.of("новый заголовок события", "новую дату", "новое имя", "новое время начала", "новое описание", "новый подарок");
+        if (choices.contains("2")) {
+            Date date = tryToGetDate("Введите новую дату.");
+            event.setDate(date);
+            was = true;
+        }
         for (int i = 1; i <= 6; i++) {
             if (choices.contains(String.valueOf(i))) {
-                if (!isBirthday && i == 6) break;
+                if (!isBirthday && i == 6 || i == 2) break;
                 System.out.println("Введите " + str.get(i-1) + ": ");
                 String newArg = scanner.nextLine();
-                if (i == 2) {
-                    Date newDate;
-                    try {
-                        newDate = Date.from(Instant.parse(newArg));
-                    } catch (Exception e) {
-                        System.out.println("Неверно задана дата. Введите заново");
-                        newDate = tryToGetDate();
-                    }
-                    event.setDate(newDate);
-                } else {
-                    switch (i) {
-                        case 1 -> event.setTitle(newArg);
-                        case 3 -> event.setName(newArg);
-                        case 4 -> event.setBeginning(newArg);
-                        case 5 -> event.setAbout(newArg);
-                        case 6 -> ((Birthday) event).setGift(newArg);
-                    }
+                switch (i) {
+                    case 1 -> event.setTitle(newArg);
+                    case 3 -> event.setName(newArg);
+                    case 4 -> event.setBeginning(newArg);
+                    case 5 -> event.setAbout(newArg);
+                    case 6 -> ((Birthday) event).setGift(newArg);
                 }
                 was = true;
             }

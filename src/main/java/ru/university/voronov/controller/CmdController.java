@@ -82,7 +82,7 @@ public class CmdController {
     }
 
     private void getByDate() {
-        System.out.println("Введите день/месяц/год события: ");
+        System.out.println("Введите дату события (гггг-мм-дд чч:мм): ");
         String rawDate = scanner.nextLine();
         try {
             Date date = Date.from(Instant.parse(rawDate));

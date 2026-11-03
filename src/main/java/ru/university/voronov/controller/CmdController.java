@@ -99,7 +99,7 @@ public class CmdController {
 
     private void createEvent() {
         int typeInt;
-        do {
+        while(true) {
             System.out.println("Типы событий:\n1. День рождения;\n2. Встреча.\nВыберите тип события: ");
             String type = scanner.nextLine();
             try {
@@ -121,7 +121,7 @@ public class CmdController {
                 continue;
             }
             break;
-        } while (true);
+        }
         System.out.println("Введите заголовок события: ");
         String title = scanner.nextLine();
         System.out.println("Введите имя человека, с которым связано событие: ");

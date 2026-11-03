@@ -1,19 +1,29 @@
 package ru.university.voronov;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+/*
+  1. Написать консольное приложение
+  2. CRUD, create, read, update, delete
+  3. Хранение данных в Map или List
+  4. todo list для демонстрации
+ */
+
+import ru.university.voronov.controller.CmdController;
+import ru.university.voronov.model.Event;
+import ru.university.voronov.repository.EventRepositoryInMemoryImpl;
+import ru.university.voronov.service.EventService;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Date;
+
 public class Main {
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
-
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
-
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
-        }
+        Map<Date, Event> eventMap = new HashMap<>();
+        EventRepositoryInMemoryImpl eventRepositoryInMemory = new EventRepositoryInMemoryImpl(eventMap);
+        EventService eventService = new EventService(eventRepositoryInMemory);
+        Scanner scanner = new Scanner(System.in);
+        CmdController cmdController = new CmdController(eventService, scanner);
+        cmdController.run();
     }
 }

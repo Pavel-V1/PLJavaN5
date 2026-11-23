@@ -2,6 +2,7 @@ package ru.university.voronov.repository;
 
 import ru.university.voronov.model.Event;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,4 +18,6 @@ public interface EventRepository {
     boolean delete(UUID id);
 
     Optional<Event> getById(UUID id);
+
+    Optional<List<Event>> getByDate(Date date);
 }

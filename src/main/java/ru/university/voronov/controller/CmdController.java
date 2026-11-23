@@ -6,10 +6,7 @@ import ru.university.voronov.model.Meeting;
 import ru.university.voronov.service.EventService;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class CmdController {
 
@@ -25,10 +22,11 @@ public class CmdController {
         while (true) {
             System.out.println("\n=== Events menu ===");
             System.out.println("1. Показать все события");
-            System.out.println("2. Найти событие по дате");
-            System.out.println("3. Создать событие");
-            System.out.println("4. Обновить событие");
-            System.out.println("5. Удалить событие");
+            System.out.println("2. Найти событие по ID");
+            System.out.println("3. Найти события по дате");
+            System.out.println("4. Создать событие");
+            System.out.println("5. Обновить событие");
+            System.out.println("6. Удалить событие");
             System.out.println("0. Выход");
             System.out.println("Выберите действие: ");
 
@@ -41,18 +39,22 @@ public class CmdController {
                         break;
 
                     case "2":
-                        getByDate();
+                        getById();
                         break;
 
                     case "3":
-                        createEvent();
+                        getByDate();
                         break;
 
                     case "4":
-                        updateEvent();
+                        createEvent();
                         break;
 
                     case "5":
+                        updateEvent();
+                        break;
+
+                    case "6":
                         deleteEvent();
                         break;
 
@@ -82,16 +84,32 @@ public class CmdController {
                 .forEach(System.out::println);
     }
 
+    private void getById() {
+        System.out.println("Введите ID события: ");
+        String rawId = scanner.nextLine();
+        try {
+            UUID id = UUID.fromString(rawId);
+            eventService.getById(id)
+                    .map(this::formatEvent)
+                    .ifPresentOrElse(
+                            System.out::println,
+                            () -> System.out.println("События с таким ID не найдено")
+                    );
+        } catch (Exception e) {
+            System.out.println("Неверно задан ID");
+        }
+    }
+
     private void getByDate() {
-        System.out.println("Введите дату события (гггг-мм-дд чч:мм): ");
+        System.out.println("Введите дату в формате гггг-дд-мм: ");
         String rawDate = scanner.nextLine();
         try {
-            Date date = Date.from(Instant.parse(rawDate));
+            Date date = Date.from(Instant.parse(rawDate + "T00:00:00Z"));
             eventService.getByDate(date)
                     .map(this::formatEvent)
                     .ifPresentOrElse(
                             System.out::println,
-                            () -> System.out.println("Задачи с такой датой не найдено")
+                            () -> System.out.println("События с такой датой не найдено")
                     );
         } catch (Exception e) {
             System.out.println("Неверно задана дата");
@@ -157,6 +175,12 @@ public class CmdController {
         eventService.deleteById(tryToGetId());
     }
 
+    private List<String> formatEvent(List<Event> events) {
+        List<String> str = new ArrayList<>();
+        events.forEach(event -> str.add(formatEvent(event)));
+        return str;
+    }
+
     private String formatEvent(Event event) {
         String string;
         if (event instanceof Birthday) {
@@ -186,7 +210,7 @@ public class CmdController {
                 id = UUID.fromString(rawId);
                 break;
             } catch (Exception e) {
-                System.out.println("Неверно задана дата. Введите заново");
+                System.out.println("Неверно задан ID. Введите заново");
             }
         }
         return id;

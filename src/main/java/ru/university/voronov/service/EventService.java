@@ -5,6 +5,7 @@ import ru.university.voronov.model.Birthday;
 import ru.university.voronov.model.Event;
 import ru.university.voronov.repository.EventRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +39,10 @@ public class EventService {
 
     public Optional<Event> getById(UUID id) {
         return eventRepository.getById(id);
+    }
+
+    public Optional<List<Event>> getByDate(Date date) {
+        return eventRepository.getByDate(date);
     }
 
     public List<Event> getAll() {

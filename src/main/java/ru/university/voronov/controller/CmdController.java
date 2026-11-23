@@ -101,7 +101,7 @@ public class CmdController {
     }
 
     private void getByDate() {
-        System.out.println("Введите дату в формате гггг-дд-мм: ");
+        System.out.println("Введите дату в формате гггг-мм-дд: ");
         String rawDate = scanner.nextLine();
         try {
             Date date = Date.from(Instant.parse(rawDate + "T00:00:00Z"));

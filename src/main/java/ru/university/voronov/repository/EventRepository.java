@@ -4,7 +4,7 @@ import ru.university.voronov.model.Event;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Date;
+import java.util.UUID;
 
 public interface EventRepository {
 
@@ -14,7 +14,7 @@ public interface EventRepository {
 
     Event update(Event event);
 
-    boolean delete(Date date);
+    boolean delete(UUID id);
 
-    Optional<Event> getByDate(Date date);
+    Optional<Event> getById(UUID id);
 }

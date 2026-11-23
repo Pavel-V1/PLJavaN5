@@ -1,9 +1,9 @@
 package ru.university.voronov.exception;
 
-import java.util.Date;
+import java.util.UUID;
 
 public class EventNotFoundException extends BusinessException {
-    public EventNotFoundException(Date date) {
-        super("Event not found with id = " + date);
+    public EventNotFoundException(UUID id) {
+        super("Event not found with id = " + id);
     }
 }

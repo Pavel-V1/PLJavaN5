@@ -1,13 +1,23 @@
 package ru.university.voronov.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 public abstract class Event {
+    private UUID id;
     private Date date;
     private String name;
     private String beginning;
     private String about;
     private String title;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public Date getDate() {
         return date;

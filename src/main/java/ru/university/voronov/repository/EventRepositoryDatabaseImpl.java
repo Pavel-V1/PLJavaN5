@@ -1,6 +1,8 @@
 package ru.university.voronov.repository;
 
+import ru.university.voronov.model.Birthday;
 import ru.university.voronov.model.Event;
+import ru.university.voronov.model.Meeting;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -26,10 +28,20 @@ public class EventRepositoryDatabaseImpl implements EventRepository {
 
             var events = new ArrayList<Event>();
             while (resultSet.next()) {
-                var event = new Event(
-                        resultSet.getObject("id", Date.class),
-                        resultSet.getString("title")
-                );
+                Date date = resultSet.getObject("date", Date.class);
+                String title = resultSet.getString("title");
+                String name = resultSet.getString("name");
+                String beginning = resultSet.getString("beginning");
+                String about = resultSet.getString("about");
+                Event event;
+                if (resultSet.getBoolean("isBirthday")) {
+                    event = new Meeting(title, date, name, beginning, about);
+                } else {
+                    event = new Birthday(
+                            title, date, name, beginning, about,
+                            resultSet.getString("gift")
+                    );
+                }
                 events.add(event);
             }
 
@@ -41,12 +53,44 @@ public class EventRepositoryDatabaseImpl implements EventRepository {
 
     @Override
     public Event create(Event event) {
-        return null;
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+
+            Date date = event.getDate();
+            String title = event.getTitle();
+            String name = event.getName();
+            String beginning = event.getBeginning();
+            String about = event.getAbout();
+            boolean isBirthday = event instanceof Birthday;
+            String gift;
+            if (isBirthday) {
+                gift = ((Birthday) event).getGift();
+            } else {
+                gift = "-";
+            }
+            var request = String.format("INSERT INTO event (title, date, name, beginning, about, gift, isBirthday) " +
+                    "VALUES (%s, %s, %s, %s, %s, %s, %b)", title, date, name, beginning, about, gift, isBirthday);
+            statement.executeUpdate(request);
+
+            return event;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
     public Event update(Event event) {
-        return null;
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+
+            var request = String.format("UPDATE event SET title = %s, date = %s, name = %s, " +
+                            "beginning = %s, about = %s, gift = %s WHERE date = %s",
+                    event.getTitle(),
+
+            );
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

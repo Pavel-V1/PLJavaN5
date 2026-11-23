@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class CmdController {
 
@@ -132,19 +133,20 @@ public class CmdController {
         System.out.println("Введите описание: ");
         String about = scanner.nextLine();
         Event event;
+        UUID id = UUID.randomUUID();
         if (typeInt == 1) {
             System.out.println("Введите подарок: ");
             String gift = scanner.nextLine();
-            event = new Birthday(title, date, name, beginning, gift, about);
+            event = new Birthday(id, title, date, name, beginning, about, gift);
         } else {
-            event = new Meeting(title, date, name, beginning, about);
+            event = new Meeting(id, title, date, name, beginning, about);
         }
         Event created = eventService.create(event);
         System.out.println("Создано событие: " + formatEvent(created));
     }
 
     private void updateEvent() {
-        eventService.getByDate(tryToGetDate())
+        eventService.getById(tryToGetId())
                 .ifPresentOrElse(
                         this::updateThisEvent,
                         () -> System.out.println("Нет задачи с такой датой")
@@ -152,7 +154,7 @@ public class CmdController {
     }
 
     private void deleteEvent() {
-        eventService.deleteByDate(tryToGetDate());
+        eventService.deleteById(tryToGetId());
     }
 
     private String formatEvent(Event event) {
@@ -173,6 +175,21 @@ public class CmdController {
                 event.getAbout(),
                 string
         );
+    }
+
+    private UUID tryToGetId() {
+        UUID id;
+        while (true) {
+            System.out.println("Введите ID события: ");
+            String rawId = scanner.nextLine();
+            try {
+                id = UUID.fromString(rawId);
+                break;
+            } catch (Exception e) {
+                System.out.println("Неверно задана дата. Введите заново");
+            }
+        }
+        return id;
     }
 
     private Date tryToGetDate() {return tryToGetDate(null);}

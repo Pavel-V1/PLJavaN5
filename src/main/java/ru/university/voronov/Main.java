@@ -3,7 +3,9 @@ package ru.university.voronov;
 
 import org.postgresql.ds.PGSimpleDataSource;
 import ru.university.voronov.controller.CmdController;
+import ru.university.voronov.model.Birthday;
 import ru.university.voronov.model.Event;
+import ru.university.voronov.model.Meeting;
 import ru.university.voronov.repository.EventRepository;
 import ru.university.voronov.repository.EventRepositoryDatabaseImpl;
 import ru.university.voronov.service.EventService;
@@ -38,7 +40,7 @@ public class Main {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
 
         dataSource.setServerNames(new String[]{"localhost"});
-        dataSource.setPortNumbers(new int[]{5432});
+        dataSource.setPortNumbers(new int[]{5434});
         dataSource.setDatabaseName("event");
         dataSource.setUser("event");
         dataSource.setPassword("event");
@@ -46,24 +48,34 @@ public class Main {
         return dataSource;
     }
 
-    public static void initializeDatabase(DataSource dataSource) {
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-
-            statement.executeUpdate();
-
-            var events = new ArrayList<Event>();
-            while (resultSet.next()) {
-                var event = new Event(
-                        resultSet.getObject("id", Date.class),
-                        resultSet.getString("title")
-                );
-                events.add(event);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public static void initializeDatabase(DataSource dataSource) {
+//        try (Connection connection = dataSource.getConnection();
+//             Statement statement = connection.createStatement();
+//             ResultSet resultSet = statement.executeQuery(query)) {
+//
+//            statement.executeUpdate();
+//
+//            var events = new ArrayList<Event>();
+//            while (resultSet.next()) {
+//                Date date = resultSet.getObject("date", Date.class);
+//                String title = resultSet.getString("title");
+//                String name = resultSet.getString("name");
+//                String beginning = resultSet.getString("beginning");
+//                String about = resultSet.getString("about");
+//                Event event;
+//                if (resultSet.getBoolean("isBirthday")) {
+//                    event = new Meeting(title, date, name, beginning, about);
+//                } else {
+//                    event = new Birthday(
+//                            title, date, name, beginning, about,
+//                            resultSet.getString("gift")
+//                    );
+//                }
+//                events.add(event);
+//            }
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

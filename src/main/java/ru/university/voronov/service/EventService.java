@@ -7,7 +7,7 @@ import ru.university.voronov.repository.EventRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Date;
+import java.util.UUID;
 
 public class EventService {
     private final EventRepository eventRepository;
@@ -25,19 +25,19 @@ public class EventService {
     public Event update(Event updatedEvent) {
         check(updatedEvent);
 
-        return eventRepository.getByDate(updatedEvent.getDate())
+        return eventRepository.getById(updatedEvent.getId())
                 .map(_ -> eventRepository.update(updatedEvent))
-                .orElseThrow(() -> new EventNotFoundException(updatedEvent.getDate()));
+                .orElseThrow(() -> new EventNotFoundException(updatedEvent.getId()));
     }
 
-    public boolean deleteByDate(Date date) {
-        return eventRepository.getByDate(date)
-                .map(_ -> eventRepository.delete(date))
-                .orElseThrow(() -> new EventNotFoundException(date));
+    public boolean deleteById(UUID id) {
+        return eventRepository.getById(id)
+                .map(_ -> eventRepository.delete(id))
+                .orElseThrow(() -> new EventNotFoundException(id));
     }
 
-    public Optional<Event> getByDate(Date date) {
-        return eventRepository.getByDate(date);
+    public Optional<Event> getById(UUID id) {
+        return eventRepository.getById(id);
     }
 
     public List<Event> getAll() {

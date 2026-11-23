@@ -2,6 +2,7 @@ package ru.university.voronov.repository;
 
 import ru.university.voronov.model.Event;
 
+import java.time.Instant;
 import java.util.*;
 
 public class EventRepositoryInMemoryImpl implements EventRepository {
@@ -32,8 +33,22 @@ public class EventRepositoryInMemoryImpl implements EventRepository {
         return data.remove(id) != null;
     }
 
-    public Optional<Event> getByDate(Date date) {
-        return Optional.ofNullable(data.get(date));
+    public Optional<List<Event>> getByDate(Date date) {
+        String[] str = date.toString().split(" ");
+        str[3] = "00:00:00";
+        Date date1 = Date.from(Instant.parse(Arrays.toString(str)));
+        str[3] = "23:59:59";
+        Date date2 = Date.from(Instant.parse(Arrays.toString(str)));
+
+        List<UUID> ids = new ArrayList<>();
+        dates.forEach((dateThis, uuid) -> {
+            if (dateThis.compareTo(date1) >= 0 && dateThis.compareTo(date2) <= 0) {
+                ids.add(uuid);
+            }
+        });
+        List<Event> events = new ArrayList<>();
+        ids.forEach(uuid -> events.add(data.get(uuid)));
+        return Optional.of(events);
     }
 
     public Optional<Event> getById(UUID id) {
